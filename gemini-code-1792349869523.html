@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>SOPONSOBOR - Admin App</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#000;color:#fff}
+button,input,select,textarea{font:inherit}button{border:0;cursor:pointer}.app{max-width:520px;margin:auto;min-height:100vh;background:#050505;padding-bottom:70px}
+header{padding:14px 16px 10px;position:sticky;top:0;background:linear-gradient(180deg,#003b34,#001f1c);z-index:10;border-bottom:1px solid #00bfa0}
+.brand{display:flex;align-items:center;gap:12px;justify-content:center;text-align:center}.brand h1{font-size:21px;margin:0}.brand small{opacity:.7}
+
+/* Scrolling Marquee Notice Bar */
+.top-notice-bar{background:#d92d45;color:#fff;font-size:13px;padding:6px 0;overflow:hidden;white-space:nowrap;display:none;position:sticky;top:58px;z-index:9;border-bottom:1px solid #ff5f70}
+.top-notice-bar marquee{display:block;width:100%;font-weight:bold}
+
+.screen{display:none;padding:16px 14px 20px}.screen.active{display:block}
+.hero{background:linear-gradient(135deg,#101010,#050505);border:1px solid #174f48;border-radius:20px;padding:15px;margin-bottom:16px;text-align:center}
+.hero img{width:100%;height:180px;object-fit:cover;border-radius:15px;background:#09221f;border:1px solid #00bfa0}
+.hero h2{margin:10px 0 3px;font-size:18px;color:#fff}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tile{padding:18px 10px;border-radius:17px;color:#fff;min-height:105px;text-align:left}.tile b{display:block;font-size:17px;margin-top:8px}.tile small{opacity:.75}
+.green{background:linear-gradient(145deg,#08b879,#087d62)}.blue{background:linear-gradient(145deg,#1487ff,#075dcc)}.purple{background:linear-gradient(145deg,#7739ed,#4d1eb8)}.orange{background:linear-gradient(145deg,#ffad00,#e66f00)}.pink{background:linear-gradient(145deg,#e52b73,#b61754)}.redlive{background:linear-gradient(145deg,#d92d45,#8d1729)}.dark{background:linear-gradient(145deg,#214c5b,#12343e)}.cyan{background:linear-gradient(145deg,#0288d1,#01579b);grid-column:span 2;min-height:85px}
+
+.card{background:#0b0b0b;border:1px solid #183f3a;border-radius:16px;padding:13px;margin:10px 0}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.muted{opacity:.7}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.tabs button{white-space:nowrap;padding:9px 13px;border-radius:20px;background:#0a0a0a;border:1px solid #183f3a;color:#aaa}.tabs button.on{background:#0bd39f;color:#04221e;font-weight:bold}
+.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:9px 5px;border-bottom:1px solid #17443f;text-align:center}.table th{color:#92aaa6}.teamcell{text-align:left!important;display:flex;align-items:center;gap:7px;min-width:125px}.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#1b4b46;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #24645b;background:#061e1b;color:#fff;outline:none}label{font-size:12px;color:#a9c0bc;display:block;margin:8px 0 5px}
+.btn{padding:10px 13px;border-radius:10px;background:#0bd39f;color:#04221e;font-weight:bold}.btn.red{background:#d84d61;color:white}.btn.gray{background:#183d39;color:#fff}.btn.small{padding:7px 9px;font-size:12px}
+.team-edit{display:grid;grid-template-columns:45px minmax(0,1fr) 85px;gap:8px;align-items:center}.team-edit img{width:45px;height:45px;border-radius:10px;object-fit:cover;background:#173e39}
+.group-title{margin:18px 0 7px;color:#74e4c7;font-size:18px}
+.match{background:#090909;border-radius:15px;padding:12px;margin:10px 0;border:1px solid #184a43}.match .teams{display:grid;grid-template-columns:1fr 45px 1fr;align-items:center;text-align:center;gap:8px}.teambox img{width:40px;height:40px;border-radius:50%;object-fit:cover}.teambox b{display:block;font-size:13px;margin-top:5px}.score{font-size:20px;font-weight:bold}.match-actions{display:flex;justify-content:space-between;margin-top:10px;gap:5px;flex-wrap:wrap}.status{font-size:11px;color:#83aaa4}
+.bracket{overflow-x:auto;padding-bottom:10px}.bracket-inner{min-width:750px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.round h3{text-align:center;font-size:14px;color:#6de0c3}.bmatch{background:#090909;border:1px solid #15564e;border-radius:14px;padding:10px;margin:15px 0}.bteam{display:flex;align-items:center;gap:6px;padding:6px;border-bottom:1px solid #17443f}.bteam:last-child{border:0}.bteam img{width:25px;height:25px;border-radius:50%;object-fit:cover}.bscore{margin-left:auto;font-weight:bold}.champ{text-align:center;padding:15px;background:#0a0a0a;border-radius:18px;border:1px solid #18b992;margin-top:15px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.notice-card{padding:11px;border-radius:12px;background:#0b1715;border:1px solid #17463f;color:#9ce8d5;font-size:13px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.empty{padding:25px;text-align:center;color:#7c9994}
+
+/* CHAT BOX DESIGN FOR ADMIN PANEL */
+.chat-box{height:280px;overflow-y:auto;background:#061e1b;border:1px solid #24645b;border-radius:10px;padding:10px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.msg{padding:8px 12px;border-radius:10px;max-width:80%;word-break:break-word}
+.msg.user{background:#37474f;margin-right:auto;text-align:left;font-size:13px}
+.msg.admin{background:#005a3e;margin-left:auto;text-align:right;font-size:15px;font-weight:bold;color:#72f2d3}
+
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);background:#020202;border-top:1px solid #15564e;display:grid;grid-template-columns:repeat(5,1fr);z-index:10}nav button{background:none;color:#7fa39d;padding:9px 2px;font-size:11px}nav button.on{color:#16dfaa}nav span{display:block;font-size:20px;margin-bottom:2px}
+.toast{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#0bd39f;color:#03221e;padding:10px 15px;border-radius:20px;display:none;z-index:20;font-weight:bold}
+@media(min-width:700px){body{padding:20px}.app{border-radius:25px;overflow:hidden;box-shadow:0 20px 60px #0008}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <div>
+      <h1 style="margin:0;font-size:24px;letter-spacing:1px">SOPONSOBOR</h1>
+      <div style="font-size:17px;margin-top:3px">Carrom Board Tournament 2026</div>
+    </div>
+  </div>
+</header>
+
+<!-- TOP SCROLLING NOTICE BAR -->
+<div id="topNoticeBar" class="top-notice-bar">
+  <marquee id="topNoticeText" scrollamount="5" behavior="scroll" direction="left">📣 নোটিশ...</marquee>
+</div>
+
+<section id="home" class="screen active">
+  <div class="hero">
+    <img src="https://i.ibb.co/C0W2kXx/carrom-board.jpg" id="heroBanner" alt="Carrom Board" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20500%20500%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23ddaa66%22/%3E%3Ccircle%20cx%3D%22250%22%20cy%3D%22250%22%20r%3D%2280%22%20fill%3D%22none%22%20stroke%3D%22%23884411%22%20stroke-width%3D%228%22/%3E%3Ccircle%20cx%3D%22250%22%20cy%3D%22250%22%20r%3D%2220%22%20fill%3D%22%23cc0000%22/%3E%3C/svg%3E'">
+    <h2>Carrom Board Tournament 2026</h2>
+    <p class="muted">Live Score • Points • Fixtures • Bracket • Chat & Notices</p>
+  </div>
+  <div class="grid">
+    <button class="tile redlive" onclick="show('live')">🔴<b>Live Score</b><small>See running matches</small></button>
+    <button class="tile green" onclick="show('points')">🏆<b>Points Table</b><small>View Group Standings</small></button>
+    <button class="tile blue" onclick="show('bracket')">🔀<b>Knockout Bracket</b><small>Quarter → Final</small></button>
+    <button class="tile purple" onclick="show('fixtures')">📅<b>Fixtures</b><small>Match Schedule</small></button>
+    <button class="tile orange" onclick="show('results')">🎯<b>Results</b><small>Update Match Score</small></button>
+    <button class="tile dark" onclick="show('teams')">👥<b>Teams</b><small>Add name & photo</small></button>
+    <button class="tile pink" onclick="show('settings')">⚙️<b>Settings</b><small>Rules / Reset</small></button>
+    <button class="tile dark" onclick="show('notices')">📣<b>Notices</b><small>Announcements</small></button>
+    <button class="tile cyan" onclick="show('chat')">💬<b>Live Chat</b><small>Chat directly with User</small></button>
+  </div>
+</section>
+
+<section id="live" class="screen">
+  <h2>🔴 Live Match Score</h2>
+  <div id="liveBody"></div>
+</section>
+
+<section id="points" class="screen">
+  <h2>🏆 Points Table</h2><div id="pointTabs" class="tabs"></div><div id="pointsBody"></div>
+</section>
+
+<section id="bracket" class="screen">
+  <h2>🔀 Knockout Bracket</h2>
+  <div id="bracketBody"></div>
+</section>
+
+<section id="fixtures" class="screen">
+  <h2>📅 Fixtures</h2>
+  <div class="card" style="margin-bottom:15px;background:#061e1b;border:1px solid #00bfa0">
+    <h3 style="margin-bottom:8px;color:#0bd39f">➕ নতুন ম্যাচ যোগ করুন</h3>
+    <div class="formgrid">
+      <div><label>গ্রুপ</label><select id="newMatchGroup"><option value="A">Group A</option><option value="B">Group B</option><option value="C">Group C</option><option value="D">Group D</option></select></div>
+      <div><label>টিম ১</label><select id="newMatchTeam1"></select></div>
+    </div>
+    <div class="formgrid" style="margin-top:6px">
+      <div><label>টিম ২</label><select id="newMatchTeam2"></select></div>
+      <div><label>&nbsp;</label><button class="btn" style="margin-top:0" onclick="addNewMatch()">ম্যাচ তালিকাভুক্ত করুন</button></div>
+    </div>
+  </div>
+  <div id="fixtureTabs" class="tabs"></div>
+  <div id="fixturesBody"></div>
+</section>
+
+<section id="results" class="screen">
+  <h2>🎯 Match Result & Admin</h2>
+  <div class="card">
+    <label>Match নির্বাচন করুন</label><select id="resultMatch"></select>
+    <div id="resultPreview"></div>
+    <div class="formgrid"><div><label>Team 1 Score</label><input id="score1" type="number" min="0" value="0"></div><div><label>Team 2 Score</label><input id="score2" type="number" min="0" value="0"></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn" style="flex:1" onclick="saveResult(true)">🔴 Save Live</button>
+      <button class="btn red" style="flex:1" onclick="finishResult()">✓ Finish</button>
+    </div>
+  </div>
+</section>
+
+<section id="teams" class="screen">
+  <div class="row"><h2>👥 Teams</h2><button class="btn small" onclick="saveTeams()">Save</button></div>
+  <div style="display:flex;gap:8px;margin:10px 0"><button class="btn" onclick="addTeam()">➕ দল যোগ করুন</button><button class="btn red" onclick="removeTeam()">➖ শেষ দল বাদ দিন</button></div>
+  <div id="teamEditor"></div>
+</section>
+
+<section id="settings" class="screen">
+  <h2>⚙️ Settings & Rules</h2>
+  <div class="card">
+    <h3>📜 Tournament Rules</h3>
+    <p class="muted">১. নকআউট টুর্নামেন্টে পরাজিত দল বাদ পড়বে।<br>২. গেম জয় করতে ২৯ পয়েন্ট প্রয়োজন।<br>৩. রেফারির সিদ্ধান্ত চূড়ান্ত।</p>
+  </div>
+  <div class="card"><h3>Tournament Name</h3><input id="tourName" value="Carrom Board Tournament 2026"><button class="btn" style="margin-top:10px" onclick="setTourName()">Save Name</button></div>
+  <div class="card"><button class="btn red" onclick="resetAll()">Reset All Data</button></div>
+</section>
+
+<section id="notices" class="screen">
+  <h2>📣 Notice Panel</h2>
+  
+  <!-- Notice ON/OFF Option -->
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between">
+    <span style="font-weight:bold;font-size:15px">উপরে নোটিশ দেখাবে (Scrolling Notice Bar):</span>
+    <select id="noticeSwitch" onchange="toggleNoticeBar()" style="width:100px;margin:0">
+      <option value="ON">ON 🟢</option>
+      <option value="OFF">OFF 🔴</option>
+    </select>
+  </div>
+
+  <!-- Send/Edit Notice Card -->
+  <div class="card">
+    <label id="noticeFormTitle">নতুন নোটিশ লিখুন</label>
+    <textarea id="noticeMessage" rows="3" placeholder="এখানে নোটিশ লিখুন..."></textarea>
+    <input type="hidden" id="editNoticeIndex" value="-1">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn" id="saveNoticeBtn" style="flex:1" onclick="sendNotice()">নোটিশ পাঠান</button>
+      <button class="btn gray" id="cancelEditBtn" style="display:none;width:100px" onclick="cancelEditNotice()">বাতিল</button>
+    </div>
+  </div>
+
+  <div id="noticeList" style="margin-top:10px"></div>
+</section>
+
+<section id="chat" class="screen">
+  <h2>💬 Live Chat with User</h2>
+  <div class="chat-box" id="chatBox"></div>
+  <div style="display:flex;gap:8px">
+    <input id="chatInput" placeholder="মেসেজ লিখুন...">
+    <button class="btn" onclick="sendChat()" style="width:90px">পাঠান</button>
+  </div>
+</section>
+
+<nav>
+<button data-s="home" onclick="show('home')"><span>⌂</span>Home</button>
+<button data-s="points" onclick="show('points')"><span>▦</span>Points</button>
+<button data-s="bracket" onclick="show('bracket')"><span>♧</span>Bracket</button>
+<button data-s="fixtures" onclick="show('fixtures')"><span>▣</span>Fixtures</button>
+<button data-s="teams" onclick="show('teams')"><span>☰</span>Teams</button>
+</nav>
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+const GROUPS=['A','B','C','D'];
+const placeholder='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100%" height="100%" fill="#174b46"/><text x="50%" y="55%" text-anchor="middle" fill="white" font-size="35">★</text></svg>');
+const carromBannerImg = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><rect width="100%" height="100%" fill="#e8bc78" stroke="#5c3417" stroke-width="25"/><rect x="35" y="35" width="430" height="430" fill="#f4cf91" stroke="#8a4f21" stroke-width="8"/><circle cx="250" cy="250" r="100" fill="none" stroke="#8a4f21" stroke-width="6"/><circle cx="250" cy="250" r="30" fill="#d92b2b"/><circle cx="65" cy="65" r="22" fill="#1a1a1a"/><circle cx="435" cy="65" r="22" fill="#1a1a1a"/><circle cx="65" cy="435" r="22" fill="#1a1a1a"/><circle cx="435" cy="435" r="22" fill="#1a1a1a"/><circle cx="250" cy="180" r="14" fill="#111"/><circle cx="250" cy="320" r="14" fill="#111"/><circle cx="180" cy="250" r="14" fill="#fff" stroke="#aaa"/><circle cx="320" cy="250" r="14" fill="#fff" stroke="#aaa"/></svg>`);
+
+let data=JSON.parse(localStorage.getItem('carrom2026')||'null');
+
+function initial(){
+ let teams=[]; 
+ GROUPS.forEach(g=>{for(let i=1;i<=4;i++)teams.push({id:g+i,name:'Team '+g+i,group:g,img:placeholder})});
+ data={name:'Carrom Board Tournament 2026',teams,matches:[],knockout:{},notices:[],noticeActive:'ON',chats:[]};
+ buildMatches(); save();
+}
+
+function save(){localStorage.setItem('carrom2026',JSON.stringify(data));}
+
+function buildMatches(){
+  data.matches=[];
+  GROUPS.forEach(g=>{
+    const ts=data.teams.filter(t=>t.group===g);
+    let n=1;
+    for(let i=0;i<ts.length;i++){
+      for(let j=i+1;j<ts.length;j++){
+        data.matches.push({id:'G'+g+n++, group:g, a:ts[i].id, b:ts[j].id, s1:null, s2:null, date:'', time:'', status:'upcoming'});
+      }
+    }
+  });
+}
+
+if(!data || !Array.isArray(data.teams) || data.teams.length<2){initial();}
+
+function team(id){return data.teams.find(t=>t.id===id)||{name:'Team',img:placeholder}}
+function img(id){return team(id)?.img||placeholder}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function show(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');
+ renderAll();
+}
+function toast(t){let x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',1800)}
+
+function renderTeams(){
+ let h='';
+ GROUPS.forEach(g=>{
+  h+=`<h3 class="group-title">Group ${g}</h3>`;
+  data.teams.filter(t=>t.group===g).forEach(t=>h+=`
+   <div class="card team-edit">
+    <label style="margin:0;cursor:pointer"><img id="p-${t.id}" src="${t.img}"><input hidden type="file" accept="image/*" onchange="uploadImg('${t.id}',this.files[0])"></label>
+    <div style="min-width:0"><input id="n-${t.id}" value="${esc(t.name)}" placeholder="দলের নাম"></div>
+    <select id="g-${t.id}" onchange="changeGroup('${t.id}',this.value)">${GROUPS.map(x=>`<option ${x===t.group?'selected':''}>${x}</option>`).join('')}</select>
+   </div>`);
+ });
+ document.getElementById('teamEditor').innerHTML=h;
+ updateMatchTeamDropdowns();
+}
+
+async function uploadImg(id,file){
+ if(!file)return;
+ const r=new FileReader();
+ r.onload=e=>{
+  team(id).img=e.target.result;
+  save(); renderTeams(); toast('ছবি যুক্ত হয়েছে ✓');
+ };
+ r.readAsDataURL(file);
+}
+
+function changeGroup(id,g){let t=team(id);t.group=g;save();renderTeams();updateMatchTeamDropdowns()}
+
+function addTeam(){
+ if(data.teams.length>=16){toast('সর্বোচ্চ ১৬টি দল রাখা যাবে');return}
+ const group='A'; let n=data.teams.length+1,id='T'+n;
+ data.teams.push({id,name:'Team '+n,group,img:placeholder});
+ save();renderAll();toast('নতুন দল যোগ হয়েছে ✓');
+}
+
+function removeTeam(){
+ if(data.teams.length<=2){toast('কমপক্ষে ২টি দল রাখতে হবে');return}
+ data.teams.pop();save();renderAll();toast('দল বাদ দেওয়া হয়েছে');
+}
+
+function saveTeams(){
+ data.teams.forEach(t=>{let v=document.getElementById('n-'+t.id);if(v)t.name=v.value.trim()||t.id});
+ save(); toast('Teams saved ✓'); renderAll()
+}
+
+function updateMatchTeamDropdowns(){
+  let t1Select = document.getElementById('newMatchTeam1');
+  let t2Select = document.getElementById('newMatchTeam2');
+  if(!t1Select || !t2Select) return;
+  let options = data.teams.map(t=>`<option value="${t.id}">${t.name} (Group ${t.group})</option>`).join('');
+  t1Select.innerHTML = options;
+  t2Select.innerHTML = options;
+}
+
+function addNewMatch(){
+  let group = document.getElementById('newMatchGroup').value;
+  let t1 = document.getElementById('newMatchTeam1').value;
+  let t2 = document.getElementById('newMatchTeam2').value;
+  if(t1 === t2){ toast('একই দলের সাথে খেলা দেওয়া যাবে না'); return; }
+  let newId = 'M' + (data.matches.length + 1);
+  data.matches.push({id: newId, group: group, a: t1, b: t2, s1: null, s2: null, date: '', time: '', status: 'upcoming'});
+  save(); renderFixtures(); renderResults(); toast('নতুন ম্যাচ যোগ করা হয়েছে ✓');
+}
+
+function stats(g){
+ let rows=data.teams.filter(t=>t.group===g).map(t=>({t,mp:0,w:0,d:0,l:0,pts:0,gf:0,ga:0}));
+ let map=Object.fromEntries(rows.map(r=>[r.t.id,r]));
+ data.matches.filter(m=>m.group===g).forEach(m=>{
+  if(m.s1===null)return;let a=map[m.a],b=map[m.b];if(!a||!b)return;a.mp++;b.mp++;a.gf+=m.s1;b.gf+=m.s2;a.ga+=m.s2;b.ga+=m.s1;
+  if(m.s1>m.s2){a.w++;a.pts+=3;b.l++}else if(m.s2>m.s1){b.w++;b.pts+=3;a.l++}else{a.d++;b.d++;a.pts++;b.pts++}
+ });
+ rows.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
+ return rows
+}
+
+let activeGroup='A';
+function renderPoints(){
+ let tabs=GROUPS.map(g=>`<button class="${g===activeGroup?'on':''}" onclick="activeGroup='${g}';renderPoints()">Group ${g}</button>`).join('');
+ document.getElementById('pointTabs').innerHTML=tabs;
+ let rows=stats(activeGroup),h=`<div class="card"><h3>Group ${activeGroup}</h3><table class="table"><tr><th>#</th><th>Team</th><th>MP</th><th>W</th><th>Pts</th></tr>`;
+ rows.forEach((r,i)=>h+=`<tr><td>${i+1}</td><td class="teamcell"><img class="avatar" src="${img(r.t.id)}">${esc(r.t.name)}</td><td>${r.mp}</td><td>${r.w}</td><td><b>${r.pts}</b></td></tr>`);
+ h+='</table></div>';document.getElementById('pointsBody').innerHTML=h
+}
+
+let fixtureGroup='A';
+function renderFixtures(){
+ document.getElementById('fixtureTabs').innerHTML=GROUPS.map(g=>`<button class="${g===fixtureGroup?'on':''}" onclick="fixtureGroup='${g}';renderFixtures()">Group ${g}</button>`).join('');
+ let ms=data.matches.filter(m=>m.group===fixtureGroup),h='';
+ if(ms.length===0){
+   h=`<div class="card empty">এই গ্রুপে কোনো ম্যাচ নেই। উপরে ফরম থেকে ম্যাচ যোগ করুন।</div>`;
+ }
+ ms.forEach((m,i)=>{
+  let done = m.status==='finished' || (m.s1!==null && m.s1!==undefined);
+  let live = m.status==='live';
+  h+=`<div class="match">
+    <div class="row">
+      <span class="status">Match ${i+1} • Group ${m.group}</span>
+      <div>
+        <span class="status" style="${live?'color:#ff5f70;font-weight:bold':''}">${live?'🔴 LIVE':(done?'Finished':'Upcoming')}</span>
+        <button class="btn red small" style="margin-left:8px;padding:3px 7px" onclick="deleteMatch('${m.id}')">ডিলিট</button>
+      </div>
+    </div>
+    <div class="teams">
+      <div class="teambox"><img src="${img(m.a)}"><b>${esc(team(m.a).name)}</b></div>
+      <div class="score">${m.s1??0} : ${m.s2??0}</div>
+      <div class="teambox"><img src="${img(m.b)}"><b>${esc(team(m.b).name)}</b></div>
+    </div>
+    <div class="formgrid" style="margin-top:10px">
+      <div><label>তারিখ</label><input type="date" id="date-${m.id}" value="${m.date||''}"></div>
+      <div><label>সময়</label><input type="time" id="time-${m.id}" value="${m.time||''}"></div>
+    </div>
+    <div class="formgrid" style="margin-top:6px">
+      <div><label>Team 1 Score</label><input type="number" min="0" max="29" id="s1-${m.id}" value="${m.s1??0}"></div>
+      <div><label>Team 2 Score</label><input type="number" min="0" max="29" id="s2-${m.id}" value="${m.s2??0}"></div>
+    </div>
+    <div class="match-actions" style="margin-top:10px">
+      <button class="btn small" onclick="saveSchedule('${m.id}')">Save Date/Time</button>
+      <button class="btn small" onclick="setMatchLive('${m.id}')">🔴 Live</button>
+      <button class="btn small" onclick="saveMatchScore('${m.id}')">Save Score</button>
+    </div>
+    ${m.date||m.time?`<div class="status" style="margin-top:6px;text-align:center">${m.date?m.date:''}${m.date&&m.time?' • ':''}${m.time?m.time:''}</div>`:''}
+  </div>`;
+ });
+ document.getElementById('fixturesBody').innerHTML=h;
+ updateMatchTeamDropdowns();
+}
+
+function deleteMatch(id){
+  if(confirm('এই ম্যাচটি ডিলিট করতে চান?')){
+    data.matches = data.matches.filter(m=>m.id!==id);
+    save();
+    renderFixtures();
+    renderResults();
+    toast('ম্যাচটি ডিলিট করা হয়েছে ✓');
+  }
+}
+
+function saveSchedule(id){
+  let m=data.matches.find(x=>x.id===id); if(!m)return;
+  m.date=document.getElementById('date-'+id).value;
+  m.time=document.getElementById('time-'+id).value;
+  save(); renderFixtures(); toast('তারিখ ও সময় সংরক্ষিত হয়েছে ✓');
+}
+
+function setMatchLive(id){
+  let m=data.matches.find(x=>x.id===id); if(!m)return;
+  m.status='live'; save(); renderFixtures(); renderLive(); toast('ম্যাচটি লাইভ করা হয়েছে ✓');
+}
+
+function saveMatchScore(id){
+  let m=data.matches.find(x=>x.id===id); if(!m)return;
+  let s1=+document.getElementById('s1-'+id).value;
+  let s2=+document.getElementById('s2-'+id).value;
+  m.s1=s1; m.s2=s2; m.status='finished';
+  save(); renderFixtures(); renderLive(); renderPoints(); toast('স্কোর সংরক্ষিত হয়েছে ✓');
+}
+
+function renderResults(){
+ let sel=document.getElementById('resultMatch');if(!sel)return;
+ sel.innerHTML=data.matches.map(m=>`<option value="${m.id}">${m.id} — ${team(m.a).name} vs ${team(m.b).name}</option>`).join('');
+ previewResult();
+}
+
+document.getElementById('resultMatch')?.addEventListener('change',previewResult);
+
+function previewResult(){
+ let id=document.getElementById('resultMatch')?.value,m=data.matches.find(x=>x.id===id);if(!m)return;
+ document.getElementById('resultPreview').innerHTML=`<div class="match"><div class="teams"><div class="teambox"><img src="${img(m.a)}"><b>${esc(team(m.a).name)}</b></div><div class="score">VS</div><div class="teambox"><img src="${img(m.b)}"><b>${esc(team(m.b).name)}</b></div></div></div>`;
+ document.getElementById('score1').value=m.s1??0;document.getElementById('score2').value=m.s2??0;
+}
+
+function saveResult(asLive=false){
+ let id=document.getElementById('resultMatch').value,m=data.matches.find(x=>x.id===id),a=+document.getElementById('score1').value,b=+document.getElementById('score2').value;
+ m.s1=a;m.s2=b;m.status=asLive?'live':'finished';save();toast('স্কোর সংরক্ষিত হয়েছে ✓');renderAll();
+}
+
+function finishResult(){saveResult(false)}
+
+function renderLive(){
+ const el=document.getElementById('liveBody');if(!el)return;
+ const lives=(data.matches||[]).filter(m=>m.status==='live');
+ el.innerHTML=lives.length?lives.map(m=>`<div class="card" style="text-align:center"><b style="color:#ff5f70">🔴 LIVE NOW</b><div class="teams" style="margin-top:10px"><div class="teambox"><img src="${img(m.a)}"><b>${esc(team(m.a).name)}</b></div><div class="score">${m.s1} : ${m.s2}</div><div class="teambox"><img src="${img(m.b)}"><b>${esc(team(m.b).name)}</b></div></div></div>`).join(''):'<div class="card empty">এই মুহূর্তে কোনো Live Match নেই।</div>';
+}
+
+function knockoutTeams(){
+  let q=[];
+  GROUPS.forEach(g=>{
+    const s=stats(g);
+    s.slice(0,2).forEach(r=>q.push(r.t.id));
+  });
+  return q;
+}
+
+function koWinner(a,b,key){
+  if(!a||!b)return null;
+  let m=data.knockout[key];
+  return m?.winner||null;
+}
+
+function koCard(title,a,b,key){
+  let sa=a?team(a):null, sb=b?team(b):null, old=data.knockout[key]||{};
+  let live=old.status==='live', done=old.status==='finished';
+  return `<div class="bmatch"><div class="row"><div class="status">${title}</div><div class="status" style="${live?'color:#ff5f70;font-weight:bold':''}">${live?'🔴 LIVE':(done?'Finished':'Upcoming')}</div></div>
+  <div class="bteam">${sa?`<img src="${img(a)}"><span>${esc(sa.name)}</span>`:'<span>TBD</span>'}<span class="bscore">${old.s1??''}</span></div>
+  <div class="bteam">${sb?`<img src="${img(b)}"><span>${esc(sb.name)}</span>`:'<span>TBD</span>'}<span class="bscore">${old.s2??''}</span></div>
+  ${a&&b?`<div class="formgrid" style="margin-top:8px"><div><label>${esc(sa.name)}</label><input type="number" id="ks1-${key}" min="0" value="${old.s1??0}"></div><div><label>${esc(sb.name)}</label><input type="number" id="ks2-${key}" min="0" value="${old.s2??0}"></div></div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px"><button class="btn small" onclick="saveKO('${key}','${a}','${b}')">Save</button><button class="btn red small" onclick="finishKO('${key}','${a}','${b}')">Finish</button></div>`:''}</div>`;
+}
+
+function saveKO(key,a,b){
+  let o=data.knockout[key]||{}; o.a=a; o.b=b;
+  let s1=+document.getElementById('ks1-'+key).value, s2=+document.getElementById('ks2-'+key).value;
+  o.s1=s1; o.s2=s2; o.status='live';
+  data.knockout[key]=o; save(); renderBracket(); toast('Knockout saved ✓');
+}
+
+function finishKO(key,a,b){
+  let o=data.knockout[key]||{};
+  let s1=+document.getElementById('ks1-'+key).value, s2=+document.getElementById('ks2-'+key).value;
+  if(s1===s2){toast('Winner নির্ধারণে score সমান হতে পারবে না');return}
+  o.a=a; o.b=b; o.s1=s1; o.s2=s2; o.winner=s1>s2?a:b; o.status='finished';
+  data.knockout[key]=o; save(); renderBracket(); toast('Knockout finished ✓');
+}
+
+function renderBracket(){
+  data.knockout = data.knockout || {};
+  let q=knockoutTeams();
+  let pairs=[[q[0],q[7]],[q[1],q[6]],[q[2],q[5]],[q[3],q[4]]];
+  let qWins=pairs.map((p,i)=>koWinner(p[0],p[1],'q'+(i+1)));
+  let s1=[qWins[0],qWins[1]], s2=[qWins[2],qWins[3]];
+  let sw1=koWinner(s1[0],s1[1],'s1'), sw2=koWinner(s2[0],s2[1],'s2');
+  let finalW=koWinner(sw1,sw2,'final');
+
+  let h='<div class="bracket"><div class="bracket-inner">';
+  h+='<div class="round"><h3>Quarter Final</h3>'+pairs.map((p,i)=>koCard('QF '+(i+1),p[0],p[1],'q'+(i+1))).join('')+'</div>';
+  h+='<div class="round"><h3>Semi Final</h3>'+koCard('SF 1',s1[0],s1[1],'s1')+koCard('SF 2',s2[0],s2[1],'s2')+'</div>';
+  h+='<div class="round"><h3>Final</h3>'+koCard('Final',sw1,sw2,'final')+(finalW?`<div class="champ">🏆<h3>CHAMPION</h3><b>${esc(team(finalW).name)}</b></div>`:'')+'</div>';
+  h+='</div></div>';
+  document.getElementById('bracketBody').innerHTML=h;
+}
+
+/* NOTICE LOGIC */
+function toggleNoticeBar(){
+  let val = document.getElementById('noticeSwitch').value;
+  data.noticeActive = val;
+  save();
+  updateTopNoticeDisplay();
+  toast(val==='ON'?'নোটিশ বার চালু হয়েছে 🟢':'নোটিশ বার বন্ধ হয়েছে 🔴');
+}
+
+function sendNotice(){
+ let msg=document.getElementById('noticeMessage').value.trim();
+ if(!msg){ toast('নোটিশ ফিল্ড খালি রাখা যাবে না'); return; }
+ data.notices=data.notices||[];
+ 
+ let editIndex = +document.getElementById('editNoticeIndex').value;
+ if(editIndex >= 0){
+   data.notices[editIndex] = msg;
+   toast('নোটিশ আপডেট করা হয়েছে ✓');
+ } else {
+   data.notices.push(msg);
+   toast('নোটিশ পাঠানো হয়েছে ✓');
+ }
+ 
+ save();
+ cancelEditNotice();
+ renderNotices();
+ updateTopNoticeDisplay();
+}
+
+function editNotice(index){
+  document.getElementById('noticeMessage').value = data.notices[index];
+  document.getElementById('editNoticeIndex').value = index;
+  document.getElementById('noticeFormTitle').textContent = 'নোটিশ এডিট করুন';
+  document.getElementById('saveNoticeBtn').textContent = 'আপডেট করুন';
+  document.getElementById('cancelEditBtn').style.display = 'block';
+}
+
+function cancelEditNotice(){
+  document.getElementById('noticeMessage').value = '';
+  document.getElementById('editNoticeIndex').value = '-1';
+  document.getElementById('noticeFormTitle').textContent = 'নতুন নোটিশ লিখুন';
+  document.getElementById('saveNoticeBtn').textContent = 'নোটিশ পাঠান';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+}
+
+function deleteNotice(index){
+  if(confirm('এই নোটিশটি মুছে ফেলতে চান?')){
+    data.notices.splice(index, 1);
+    save();
+    renderNotices();
+    updateTopNoticeDisplay();
+    toast('নোটিশ মুছে ফেলা হয়েছে');
+  }
+}
+
+function renderNotices(){
+ let box=document.getElementById('noticeList'); if(!box)return;
+ data.notices = data.notices || [];
+ if(data.notices.length===0){
+   box.innerHTML = '<div class="card empty">কোনো নোটিশ নেই।</div>';
+   return;
+ }
+ box.innerHTML=data.notices.map((n,i)=>`
+   <div class="notice-card">
+     <div style="flex:1">📣 ${esc(n)}</div>
+     <div style="display:flex;gap:4px">
+       <button class="btn small" onclick="editNotice(${i})">এডিট</button>
+       <button class="btn red small" onclick="deleteNotice(${i})">ডিলিট</button>
+     </div>
+   </div>
+ `).join('');
+}
+
+function updateTopNoticeDisplay(){
+  let bar = document.getElementById('topNoticeBar');
+  let txt = document.getElementById('topNoticeText');
+  let sw = document.getElementById('noticeSwitch');
+  
+  if(sw) sw.value = data.noticeActive || 'ON';
+  
+  if(data.noticeActive === 'OFF' || !data.notices || data.notices.length === 0){
+    if(bar) bar.style.display = 'none';
+  } else {
+    if(bar) bar.style.display = 'block';
+    if(txt) txt.textContent = '📣 ' + data.notices.join('   •••   📣 ');
+  }
+}
+
+function sendChat(){
+ let inp=document.getElementById('chatInput');let val=inp.value.trim();if(!val)return;
+ data.chats=data.chats||[]; 
+ data.chats.push({sender:'admin',text:val}); 
+ save();
+ inp.value=''; renderChat();
+}
+
+function renderChat(){
+ let box=document.getElementById('chatBox');if(!box)return;
+ box.innerHTML=(data.chats||[]).map(c=>`
+   <div class="msg ${c.sender}">
+     <span style="font-size:10px;opacity:0.75;display:block;margin-bottom:3px">${c.sender==='admin'?'অ্যাডমিন (Admin)':'ইউজার (User)'}</span>
+     ${esc(c.text)}
+   </div>
+ `).join('');
+ box.scrollTop=box.scrollHeight;
+}
+
+function renderAll(){
+ document.getElementById('tourName').value=data.name||'';
+ const heroImg = document.getElementById('heroBanner');
+ if(heroImg) heroImg.src = carromBannerImg;
+ renderTeams(); renderPoints(); renderFixtures(); renderResults(); renderLive(); renderBracket(); renderNotices(); renderChat(); updateTopNoticeDisplay();
+}
+
+function setTourName(){data.name=document.getElementById('tourName').value.trim();save();toast('নাম সংরক্ষিত হয়েছে ✓')}
+
+function resetAll(){if(confirm('সব ডাটা মুছে ফেলতে চান?')){localStorage.removeItem('carrom2026');initial();renderAll();toast('রিসেট সম্পন্ন হয়েছে')}}
+
+renderAll();
+</script>
+</body>
+</html>
